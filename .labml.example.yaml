@@ -1,0 +1,3 @@
+check_repo_dirty: false
+experiments_path: '.labml'
+web_api: 'Your token here -> https://app.labml.ai/settings'

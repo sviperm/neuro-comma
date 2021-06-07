@@ -1,0 +1,15 @@
+version: '3.4'
+
+services:
+  punct-restoration:
+    image: punct-restoration
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./server:/app/app
+      - ./models:/app/models
+      - ./src:/app/src
+    ports:
+      - 8001:80
+    restart: unless-stopped
