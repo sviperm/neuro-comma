@@ -136,7 +136,7 @@ data/*
 !data/debug-data
 
 # Models
-models/*
+**/*.pt
 
 # LabML
 .labml/*
