@@ -1,4 +1,3 @@
-import re
 from pathlib import Path
 from typing import Dict, Type, Union
 
@@ -6,10 +5,10 @@ import torch
 from transformers.tokenization_utils import (PreTrainedTokenizer,
                                              PreTrainedTokenizerFast)
 
-from dataset import BaseDataset
-from model import CorrectionModel
-from pretrained import PRETRAINED_MODELS
-from utils import get_last_pretrained_weight_path, load_params
+from neuro_comma.dataset import BaseDataset
+from neuro_comma.model import CorrectionModel
+from neuro_comma.pretrained import PRETRAINED_MODELS
+from neuro_comma.utils import get_last_pretrained_weight_path, load_params
 
 
 class Predictor:

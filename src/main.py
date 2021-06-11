@@ -1,12 +1,11 @@
 from typing import List, Union
 
 from fastapi import FastAPI
-from predict import Predictor
 from pydantic import BaseModel
 
-app = FastAPI()
+from neuro_comma.cache import ModelCache
 
-punct_restorer = Predictor('repunct-model^4', model_weights='weights_ep4_9910.pt')
+app = FastAPI()
 
 
 class Data(BaseModel):
@@ -37,21 +36,23 @@ class OutputData(Data):
 
 @app.post("/", response_model=OutputData)
 async def punctuation_restoration(input: InputData):
+    model = ModelCache().model
     data = input.data
     if isinstance(data, str):
-        output_data = punct_restorer(data)
+        output_data = model(data)
     else:
-        output_data = [punct_restorer(text) for text in data]
+        output_data = [model(text) for text in data]
     return {"data": output_data}
 
 
 @app.post("/clear_commas", response_model=OutputData)
 async def remove_comas_punctuation_restoration(input: InputData):
+    model = ModelCache().model
     data = input.data
     if isinstance(data, str):
-        output_data = punct_restorer(data.replace(',', ''))
+        output_data = model(data.replace(',', ''))
     else:
-        output_data = [punct_restorer(text.replace(',', '')) for text in data]
+        output_data = [model(text.replace(',', '')) for text in data]
     return {"data": output_data}
 
 

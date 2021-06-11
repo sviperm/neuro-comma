@@ -6,8 +6,8 @@ from torch.tensor import Tensor
 from tqdm import tqdm
 from transformers import PreTrainedTokenizer
 
-from augmentation import AUGMENTATIONS
-from pretrained import TOKEN_IDX
+from neuro_comma.augmentation import AUGMENTATIONS
+from neuro_comma.pretrained import TOKEN_IDX
 
 
 class BaseDataset(torch.utils.data.Dataset):

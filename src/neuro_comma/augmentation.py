@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from pretrained import TOKEN_IDX
+from neuro_comma.pretrained import TOKEN_IDX
 
 # probability of applying substitution operation on tokens selected for augmentation
 alpha_sub = 0.40

@@ -7,9 +7,8 @@ services:
       context: .
       dockerfile: ./Dockerfile
     volumes:
-      - ./server:/app/app
       - ./models:/app/models
-      - ./src:/app/src
+      - ./src:/app
     ports:
       - 8001:80
     restart: unless-stopped

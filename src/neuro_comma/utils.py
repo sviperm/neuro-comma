@@ -4,7 +4,7 @@ from argparse import Namespace
 from pathlib import Path
 from typing import Tuple
 
-from model import CorrectionModel
+from neuro_comma.model import CorrectionModel
 
 
 def get_model_save_path(model_dir: Path, args: Namespace) -> Path:

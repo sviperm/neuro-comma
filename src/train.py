@@ -11,16 +11,16 @@ from numpy import ndarray
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-import augmentation
-from argparser import parse_train_arguments
-from dataset import RepunctDataset
-from logger import (log_args, log_target_test_metrics, log_test_metrics,
-                    log_text, log_train_epoch, log_val_epoch)
-from model import CorrectionModel
-from pretrained import PRETRAINED_MODELS
-from utils import (export_params, get_last_epoch_params,
-                   get_last_pretrained_weight_path, get_model_save_path,
-                   load_params, save_weights)
+from neuro_comma import augmentation
+from neuro_comma.argparser import parse_train_arguments
+from neuro_comma.dataset import RepunctDataset
+from neuro_comma.logger import (log_args, log_target_test_metrics, log_test_metrics,
+                                log_text, log_train_epoch, log_val_epoch)
+from neuro_comma.model import CorrectionModel
+from neuro_comma.pretrained import PRETRAINED_MODELS
+from neuro_comma.utils import (export_params, get_last_epoch_params,
+                               get_last_pretrained_weight_path, get_model_save_path,
+                               load_params, save_weights)
 
 # https://github.com/pytorch/pytorch/issues/11201
 torch.multiprocessing.set_sharing_strategy('file_system')

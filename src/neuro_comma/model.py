@@ -7,7 +7,7 @@ import torch.nn as nn
 from torch.tensor import Tensor
 from transformers import PreTrainedModel
 
-from pretrained import PRETRAINED_MODELS
+from neuro_comma.pretrained import PRETRAINED_MODELS
 
 Path_type = Union[Path, str, os.PathLike]
 
