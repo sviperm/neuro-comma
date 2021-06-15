@@ -38,10 +38,10 @@ This library was developed with the idea to help us to create punctuation restor
     ```shell
     docker-compose down
     ```
+
 ## Model training
 
-More examples [here](https://github.com/sviperm/neuro-comma/tree/master/scripts)
-
+Model training from scratch:
 ```shell
 python src/train.py \
     --model-name repunct-model \
@@ -59,11 +59,51 @@ python src/train.py \
     --cuda 
 ```
 
+Fine-tuning already trained model. Add `--fine-tune` argument, this will load params from `repunct-model` and apply them to training function. This will create new subdirectory with `{model-name}_ft` name in `models/` directory. Source model will be untouched.
+
+```shell
+python src/train.py \
+    --model-name repunct-model \
+    --fine-tune \
+    --targets O COMMA PERIOD \
+    --train-data data/repunct/train \
+    --val-data data/repunct/test \
+    --test-data data/repunct/test \
+    --store-best-weights \
+    --epoch 3 \
+    --batch-size 4 \
+    --labml \
+    --seed 1 \
+    --cuda 
+```
+
+In some cases you want to resume training (computer crashed, light blinked, etc.). This will resume training from last model checkpoint (saved weight). Just add `--resume` argument.
+
+```shell
+python src/train.py \
+    --model-name repunct-model \
+    --resume \
+    --pretrained-model DeepPavlov/rubert-base-cased-sentence \
+    --targets O COMMA PERIOD \
+    --train-data data/repunct/train \
+    --val-data data/repunct/test \
+    --test-data data/repunct/test \
+    --store-best-weights \
+    --epoch 4 \
+    --batch-size 4 \
+    --augment-rate 0.15 \
+    --labml \
+    --seed 1 \
+    --cuda 
+```
+
+More examples [here](https://github.com/sviperm/neuro-comma/tree/master/scripts)
+
 ## How it works
 
 Before inserting raw text into model it should be tokenized. Library handle it with [`BaseDataset.parse_tokens`](https://github.com/sviperm/neuro-comma/blob/fc89b977b5e3caf866f54f9e2a0d9503869a8a57/src/neuro_comma/dataset.py#L63)
 
-[Model architecture](https://github.com/sviperm/neuro-comma/blob/fc89b977b5e3caf866f54f9e2a0d9503869a8a57/src/neuro_comma/model.py#L15) is pretty easy and strait forward:
+[Model architecture](https://github.com/sviperm/neuro-comma/blob/fc89b977b5e3caf866f54f9e2a0d9503869a8a57/src/neuro_comma/model.py#L15) is pretty easy and straight forward:
  - BERT layer - [DeepPavlov/rubert-base-cased-sentence](https://huggingface.co/DeepPavlov/rubert-base-cased-sentence) language model
  - Bi-LSTM layer - to reduce demsions
  - Linear layer - final layer to predict what symbol should go after token
