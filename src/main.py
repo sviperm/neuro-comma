@@ -41,7 +41,7 @@ async def punctuation_restoration(input: InputData):
     if isinstance(data, str):
         output_data = model(data)
     else:
-        output_data = [model(text) for text in data]
+        output_data = [model(text) for text in data]  # type: ignore
     return {"data": output_data}
 
 
@@ -52,7 +52,7 @@ async def remove_comas_punctuation_restoration(input: InputData):
     if isinstance(data, str):
         output_data = model(data.replace(',', ''))
     else:
-        output_data = [model(text.replace(',', '')) for text in data]
+        output_data = [model(text.replace(',', '')) for text in data]  # type: ignore
     return {"data": output_data}
 
 

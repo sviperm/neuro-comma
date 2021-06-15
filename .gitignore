@@ -132,8 +132,8 @@ dmypy.json
 .pyre/
 
 # Data
-data/*
 !data/debug-data
+data/repunct/*
 
 # Models
 **/*.pt
@@ -142,6 +142,12 @@ data/*
 .labml/*
 .labml.yaml
 
+# DVC
+.dvc/config.local
+.dvc/tmp
+.dvc/cache
+
 !**/.gitkeep
+!**/*.dvc
 
 docker-compose.debug.yml
