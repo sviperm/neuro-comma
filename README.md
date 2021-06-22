@@ -111,4 +111,8 @@ Before inserting raw text into model it should be tokenized. Library handle it w
 ![Model architecture](readme/model-architecture.png)
 ## Credits
 
+[Our article on habr.ru](https://habr.com/ru/company/barsgroup/blog/563854/)
+
 This repository contains code (which was edited for production purposes) from [xashru/punctuation-restoration](https://github.com/xashru/punctuation-restoration).
+
+Special thanks to [@akvarats](https://github.com/akvarats)
