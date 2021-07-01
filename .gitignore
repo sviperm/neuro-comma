@@ -132,8 +132,11 @@ dmypy.json
 .pyre/
 
 # Data
+data/
 !data/debug-data
 data/repunct/*
+
+files/
 
 # Models
 **/*.pt
