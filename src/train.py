@@ -185,7 +185,7 @@ def train_epoch(model: nn.Module,
 
 def validate_epoch(model: nn.Module,
                    loader: DataLoader,
-                   criterion: nn.Module) -> Tuple[float, float]:
+                   criterion: nn.Module) -> Tuple[float, float, float, float, float]:
     """
     Validate sinlge epoch
 
@@ -195,12 +195,18 @@ def validate_epoch(model: nn.Module,
         criterion (nn.Module): criterion
 
     Returns:
-        tuple[float, float]: validation_loss, validation_accuracy
+        tuple[float, float, float, float, float]: validation_loss, validation_accuracy, f1, precision, recall
     """
     num_iteration = 0
     correct = 0.
     total = 0.
     val_loss = 0.0
+
+    # +1 for overall result
+    tp = np.zeros(1 + len(TARGETS), dtype=np.int64)
+    fp = np.zeros(1 + len(TARGETS), dtype=np.int64)
+    fn = np.zeros(1 + len(TARGETS), dtype=np.int64)
+    cm = np.zeros((len(TARGETS), len(TARGETS)), dtype=np.int64)
 
     model.eval()
     with torch.no_grad():
@@ -214,18 +220,50 @@ def validate_epoch(model: nn.Module,
             y_predict = y_predict.view(-1, y_predict.shape[2])
 
             loss = criterion(y_predict, y)
+            val_loss += loss.item()
+
             y_predict = torch.argmax(y_predict, dim=1).view(-1)
 
-            val_loss += loss.item()
             num_iteration += 1
             y_mask = y_mask.view(-1)
             correct += torch.sum(y_mask * (y_predict == y).long()).item()
             total += torch.sum(y_mask).item()
 
+            for i in range(y.shape[0]):
+                if y_mask[i] == 0:
+                    # we can ignore this because we know there won't be
+                    # any punctuation in this position since we created
+                    # this position due to padding or sub-word tokenization
+                    continue
+                cor = y[i]
+                prd = y_predict[i]
+                if cor == prd:
+                    tp[cor] += 1
+                else:
+                    fn[cor] += 1
+                    fp[prd] += 1
+                cm[cor][prd] += 1
+
+    # ignore first index which is for no punctuation
+    tp[-1] = np.sum(tp[1:])
+    fp[-1] = np.sum(fp[1:])
+    fn[-1] = np.sum(fn[1:])
+
+    precision = tp / (tp + fp)
+    recall = tp / (tp + fn)
+    f1 = 2 * precision * recall / (precision + recall)
+
     val_loss = val_loss / num_iteration
     val_acc = correct / total
 
-    return val_loss, val_acc
+    log_test_metrics(LOG_PATH, precision, recall, f1, val_acc, cm)
+
+    non_O_keys = " + ".join(list(TARGETS)[1:])
+    targets = list(TARGETS) + [non_O_keys]
+    for i, target in enumerate(targets):
+        log_target_test_metrics(LOG_PATH, target, precision[i], recall[i], f1[i])
+
+    return val_loss, val_acc, f1, precision, recall
 
 
 def calc_accuracy_metrics(model: nn.Module,
@@ -312,14 +350,17 @@ def train() -> None:
             train_loss, train_acc = train_epoch(MODEL, train_loader, CRITERION, OPTIMIZER)
             log_train_epoch(LOG_PATH, epoch, train_loss, train_acc)
 
-            val_loss, val_acc = validate_epoch(MODEL, val_loader, CRITERION)
+            val_loss, val_acc, f1, precision, recall = validate_epoch(MODEL, val_loader, CRITERION)
             log_val_epoch(LOG_PATH, epoch, val_loss, val_acc)
 
             if args.labml:
                 tracker.save(epoch, {'train_loss': train_loss,
                                      'train_accuracy': train_acc,
                                      'val_loss': val_loss,
-                                     'val_accuracy': val_acc})
+                                     'val_accuracy': val_acc,
+                                     'f1': f1,
+                                     'precision': precision,
+                                     'recall': recall})
 
             if args.store_every_weight:
                 save_weights(MODEL, WEIGHTS_SAVE_DIR, epoch, val_acc)

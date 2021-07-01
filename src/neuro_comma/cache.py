@@ -1,6 +1,6 @@
 import threading
 
-from neuro_comma.predict import Predictor
+from neuro_comma.predict import RepunctPredictor
 
 
 class ModelCache(object):
@@ -18,9 +18,9 @@ class ModelCache(object):
             with self._lock:
                 if self._model is None:
                     # загружаем модель
-                    self._model = Predictor('repunct-model', model_weights='weights_ep4_9910.pt')
+                    self._model = RepunctPredictor('repunct-model', model_weights='weights_ep4_9910.pt')
 
     @property
-    def model(self) -> Predictor:
+    def model(self) -> RepunctPredictor:
         self.load_model()
         return self._model

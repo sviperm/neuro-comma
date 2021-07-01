@@ -1,2 +1,2 @@
-labml==0.4.117
-transformers==2.11.0
+labml==0.4.125
+transformers==4.7.0

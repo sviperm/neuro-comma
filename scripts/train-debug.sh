@@ -1,5 +1,6 @@
 #!/bin/bash
 
+TOKENIZERS_PARALLELISM=false \
 python src/train.py \
     --model-name debug-model \
     --train-data data/debug-data/train \

@@ -1,5 +1,5 @@
-fastapi==0.65.1
-labml==0.4.117
+fastapi==0.65.2
+labml==0.4.125
 torch==1.8.1
-transformers==2.11.0
+transformers==4.7.0
 uvicorn==0.13.4

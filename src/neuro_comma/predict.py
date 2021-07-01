@@ -2,8 +2,8 @@ from pathlib import Path
 from typing import Dict, Type, Union
 
 import torch
-from transformers.tokenization_utils import (PreTrainedTokenizer,
-                                             PreTrainedTokenizerFast)
+from transformers.tokenization_utils import PreTrainedTokenizer
+from transformers.tokenization_utils_fast import PreTrainedTokenizerFast
 
 from neuro_comma.dataset import BaseDataset
 from neuro_comma.model import CorrectionModel
@@ -11,7 +11,7 @@ from neuro_comma.pretrained import PRETRAINED_MODELS
 from neuro_comma.utils import get_last_pretrained_weight_path, load_params
 
 
-class Predictor:
+class BasePredictor:
     def __init__(self,
                  model_name: str,
                  models_root: Path = Path("models"),
@@ -48,6 +48,8 @@ class Predictor:
         tokenizer = PRETRAINED_MODELS[name][1].from_pretrained(name)
         return tokenizer
 
+
+class RepunctPredictor(BasePredictor):
     def __call__(self, text: str, decode_map: Dict[int, str] = {0: '', 1: ',', 2: '.'}) -> str:
         words_original_case = text.split()
         tokens = text.split()
@@ -57,13 +59,10 @@ class Predictor:
         seq_len = self.params['sequence_length']
         decode_idx = 0
 
-        data = self.dataset_class.parse_tokens(tokens,
-                                               self.tokenizer,
-                                               seq_len,
-                                               token_style,
-                                               debug=False)
-
-        data = torch.tensor(data)
+        data = torch.tensor(self.dataset_class.parse_tokens(tokens,
+                                                            self.tokenizer,
+                                                            seq_len,
+                                                            token_style))
 
         x_indecies = torch.tensor([0])
         x = torch.index_select(data, 1, x_indecies).reshape(2, -1).to(self.device)
@@ -88,23 +87,4 @@ class Predictor:
                 decode_idx += 1
 
         result = result.strip()
-        # result = re.sub(r'(\w)[\.|,]*$', r'\g<1>.', result)
         return result
-
-
-if __name__ == '__main__':
-    inputs = [
-        'отфильтруй по убыванию средней стоимости сгруппируй по возрасту',
-        'сгруппируй по коду отсортируй по убыванию средней выручки',
-        'сгруппируй по коду отсортируй по убыванию средней выручки и покажи только те которые начинаются на единицу',
-        'покажи сотрудников которые закрыли больше десяти задач',
-        'чтобы изучить SQL необходима практика',
-        'поэтому даже несмотря на то что SQL старый язык похоже его ждет еще очень долгая жизнь и блестящее будущее'
-    ]
-
-    punct_restorer = Predictor('repunct-model^4')
-
-    for input in inputs:
-        output = punct_restorer(input)
-        print(f'Original text:\n{input}')
-        print(f'Punctuated text:\n{output}\n')
