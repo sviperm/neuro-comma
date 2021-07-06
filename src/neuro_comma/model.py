@@ -1,11 +1,10 @@
 import os
 from pathlib import Path
-from typing import Dict, Union
+from typing import Dict, Optional, Union
 
 import torch
 import torch.nn as nn
 from torch.tensor import Tensor
-from transformers import PreTrainedModel
 
 from neuro_comma.pretrained import PRETRAINED_MODELS
 
@@ -14,10 +13,12 @@ Path_type = Union[Path, str, os.PathLike]
 
 class CorrectionModel(nn.Module):
     def __init__(self,
-                 pretrained_model: PreTrainedModel,
+                 pretrained_model: str,
                  targets: Dict[str, int],
-                 freeze_pretrained=False,
-                 lstm_dim=-1) -> None:
+                 freeze_pretrained: Optional[bool] = False,
+                 lstm_dim: int = -1,
+                 *args,
+                 **kwargs) -> None:
 
         super(CorrectionModel, self).__init__()
         self.pretrained_transformer = PRETRAINED_MODELS[pretrained_model][0].from_pretrained(pretrained_model)
@@ -62,6 +63,12 @@ class CorrectionModel(nn.Module):
 
     def load(self, load_path: Path_type, *args, **kwargs) -> None:
         self.load_state_dict(torch.load(load_path, *args, **kwargs))
+
+    def quantize(self, *args, **kwargs):
+        quantized_model = torch.quantization.quantize_dynamic(
+            self, {torch.nn.Linear}, dtype=torch.qint8
+        )
+        return quantized_model
 
     def modify_last_linear(self, *args, **kwargs):
         self.linear = nn.Linear(*args, **kwargs)

@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict, Type, Union
+from typing import Dict, List, Optional, Set, Tuple, Type, Union
 
 import torch
 from transformers.tokenization_utils import PreTrainedTokenizer
@@ -16,27 +16,33 @@ class BasePredictor:
                  model_name: str,
                  models_root: Path = Path("models"),
                  dataset_class: Type[BaseDataset] = BaseDataset,
-                 model_weights: str = None,
+                 model_weights: Optional[str] = None,
+                 quantization: Optional[bool] = False,
+                 *args,
+                 **kwargs,
                  ) -> None:
 
         model_dir = models_root / model_name
         self.params = load_params(model_dir)
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.device = torch.device('cuda' if (not quantization) and torch.cuda.is_available() else 'cpu')
 
         if not model_weights:
             self.weights = get_last_pretrained_weight_path(model_dir)
         else:
             self.weights = model_dir / 'weights' / model_weights
 
-        self.model = self.load_model()
+        self.model = self.load_model(quantization=quantization)
         self.tokenizer = self.load_tokenizer()
         self.dataset_class = dataset_class
 
-    def load_model(self) -> CorrectionModel:
+    def load_model(self, quantization: Optional[bool] = False) -> CorrectionModel:
         model = CorrectionModel(self.params['pretrained_model'],
                                 self.params['targets'],
                                 self.params['freeze_pretrained'],
                                 self.params['lstm_dim'])
+
+        if quantization:
+            model = model.quantize()
 
         model.to(self.device)
         model.load(self.weights, map_location=self.device)
