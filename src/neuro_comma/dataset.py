@@ -52,7 +52,7 @@ class BaseDataset(torch.utils.data.Dataset):
                     else:
                         continue
 
-        data = self.parse_tokens(x, self.tokenizer, self.seq_len, self.token_style, y)
+        data = self.parse_tokens(x, self.tokenizer, self.seq_len, self.token_style, y, *args, **kwargs)
         return data
 
     @classmethod
@@ -182,7 +182,9 @@ class RepunctDataset(BaseDataset):
                  token_style: str,
                  is_train=False,
                  augment_rate=0.,
-                 augment_type='substitute') -> None:
+                 augment_type='substitute',
+                 *args,
+                 **kwargs) -> None:
         """Preprocess data for restore punctuation
 
         Args:
@@ -195,7 +197,7 @@ class RepunctDataset(BaseDataset):
             augment_rate (`float, optional`): percent of data which should be augmented. Defaults to 0.0.
             augment_type (`str, optional`): augmentation type. Defaults to 'substitute'.
         """
-        super().__init__(files, tokenizer, targets, sequence_len, token_style)
+        super().__init__(files, tokenizer, targets, sequence_len, token_style, *args, **kwargs)
 
         self.is_train = is_train
         self.augment_type = augment_type

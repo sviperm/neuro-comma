@@ -14,13 +14,14 @@ from tqdm import tqdm
 from neuro_comma import augmentation
 from neuro_comma.argparser import parse_train_arguments
 from neuro_comma.dataset import RepunctDataset
-from neuro_comma.logger import (log_args, log_target_test_metrics, log_test_metrics,
-                                log_text, log_train_epoch, log_val_epoch)
+from neuro_comma.logger import (log_args, log_target_test_metrics,
+                                log_test_metrics, log_text, log_train_epoch,
+                                log_val_epoch)
 from neuro_comma.model import CorrectionModel
 from neuro_comma.pretrained import PRETRAINED_MODELS
 from neuro_comma.utils import (export_params, get_last_epoch_params,
-                               get_last_pretrained_weight_path, get_model_save_path,
-                               load_params, save_weights)
+                               get_last_pretrained_weight_path,
+                               get_model_save_path, load_params, save_weights)
 
 # https://github.com/pytorch/pytorch/issues/11201
 torch.multiprocessing.set_sharing_strategy('file_system')
@@ -99,13 +100,13 @@ print('Loading train data...')
 train_dataset = RepunctDataset(args.train_data, tokenizer=tokenizer, targets=TARGETS,
                                sequence_len=SEQ_LEN, token_style=token_style,
                                is_train=True, augment_rate=AUG_RATE,
-                               augment_type=AUG_TYPE)
+                               augment_type=AUG_TYPE, debug=True)
 train_loader = DataLoader(train_dataset, **data_loader_params)
 
 print('Loading validation data...')
 val_dataset = RepunctDataset(args.val_data, tokenizer=tokenizer, targets=TARGETS,
                              sequence_len=SEQ_LEN, token_style=token_style,
-                             is_train=True)
+                             is_train=True, debug=True)
 val_loader = DataLoader(val_dataset, **data_loader_params)
 
 if args.test_data:
