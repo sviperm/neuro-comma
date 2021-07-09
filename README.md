@@ -27,9 +27,17 @@ This library was developed with the idea to help us to create punctuation restor
     sh scripts/installation.sh
     ```
 
-## Production usage
+## Python module usage
+ - Choose model from [releases section](https://github.com/sviperm/neuro-comma/releases)
+ - Checkout to release tag!
+ - Download and unzip model
+ - Check [`quantization.ipynb`](https://github.com/sviperm/neuro-comma/blob/repunct-quant/notebooks/quantization.ipynb) notebook for example how use predictor.
 
- - Extract [model from release section](https://github.com/sviperm/neuro-comma/releases/tag/repunct)
+
+## Production usage
+ - Choose model from [releases section](https://github.com/sviperm/neuro-comma/releases)
+ - Checkout to release tag!
+ - Download and unzip model
  - Run `docker-compose`
     ```shell
     docker-compose up -d
